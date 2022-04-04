@@ -10,7 +10,6 @@ import hvac
 import click
 import requests
 
-HOLA LO CAMBIE AL ARCHkjgjhkgjhvj
 
 cluster = MongoClient('mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 db = cluster['password_manager']
@@ -30,7 +29,11 @@ def sign_up():
     if mainpw == mainpw_2:
         url ='https://18.231.120.197:8200/v1/secret/data/password_manager'
         headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
-        r = requests.post(url, headers=headers, data={'user': mainpw}, verify=False)
+        info = '{"data":{"user": "%s"}}' % (mainpw)
+
+        r = requests.post(url, headers=headers, data=info, verify=False)
+
+        print(r.json())
         print('La password fue seteada correctamente')
 
         log_in()
@@ -47,7 +50,7 @@ def log_in():
     url ='https://18.231.120.197:8200/v1/secret/data/password_manager'
     headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
     r = requests.get(url, headers=headers, verify=False)
-
+    print(r.json())
     if r.json()['data']['data']['user'] == try_1:
         print('Welcome!')
         menu()
@@ -264,5 +267,6 @@ def delete():
             else:
                 print('Se ha cancelado la operacion')
 
-#menu()
-sign_up()
+
+log_in()
+
