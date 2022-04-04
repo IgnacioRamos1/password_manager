@@ -1,0 +1,9 @@
+
+PyInquirer  
+cryptography
+pymongo  
+hvac
+click
+requests
+dnspython
+
