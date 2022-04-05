@@ -50,7 +50,7 @@ def sign_up():
 def log_in():
     # Ingresar main password para poder acceder al manager
     log_in_password = click.prompt(
-        'Ingrese la main password para poder acceder'
+        'Enter the main password to access'
         )
 
     url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
@@ -61,19 +61,19 @@ def log_in():
         print('Welcome!')
         menu()
     else:
-        print('El usuario o la password es incorrecto')
+        print('The main password is incorrect')
         return 'error'
 
 
 def menu():
     options = [
-        'Seleccionar servicio',
-        'Agregar cuenta nueva',
-        'Generador de password',
-        'Buscar un usuario',
-        'Lista completa de cuentas',
-        'Modificar una cuenta',
-        'Eliminar una cuenta'
+        'Select service',
+        'Add new account',
+        'Password Generator',
+        'Search for a username',
+        'List of all accounts',
+        'Modify an account',
+        'Delete an account'
         ]
     questions = [
         {
@@ -84,87 +84,85 @@ def menu():
         }
     ]
     answers = prompt(questions, style=custom_style_2)
-    if answers['theme'] == 'Seleccionar servicio':
-        seleccionar_servicio()
-    elif answers['theme'] == 'Agregar cuenta nueva':
-        agregar_cuenta()
-    elif answers['theme'] == 'Generador de password':
-        random_pasword()
-    elif answers['theme'] == 'Buscar un usuario':
+    if answers['theme'] == 'Select service':
+        select_service()
+    elif answers['theme'] == 'Add new account':
+        add_new_account()
+    elif answers['theme'] == 'Password Generator':
+        password_generator()
+    elif answers['theme'] == 'Search for a username':
         search_username()
-    elif answers['theme'] == 'Lista completa de cuentas':
-        complete_list()
-    elif answers['theme'] == 'Modificar una cuenta':
+    elif answers['theme'] == 'List of all accounts':
+        get_all_accounts()
+    elif answers['theme'] == 'Modify an account':
         modify()
-    elif answers['theme'] == 'Eliminar una cuenta':
+    elif answers['theme'] == 'Delete an account':
         delete()
 
 # ------------------------------------------------------
 
 
-def seleccionar_servicio():
-    busqueda = click.prompt(
-        'Ingrese el servicio que desea buscar'
+def select_service():
+    search = click.prompt(
+        'Enter the service you want to search'
         ).capitalize()
 
-    resultado = list(collection.find({'servicio': busqueda}))
+    result = list(collection.find({'service': search}))
 
-    if len(resultado) == 0:
+    if len(result) == 0:
         # No existen cuentas para ese servicio
-        print('No existen cuentas para ese servicio')
+        print('There are not accounts for that service')
     else:
-        for account in resultado:
-            uhpassword = decrypt(account['password'])
+        for account in result:
+            plain_text_password = decrypt(account['password'])
             print('----------------------------')
-            print(f'Usuario  | {account["username"]}')
-            print(f'Passowrd | {uhpassword}')
+            print(f'User  | {account["username"]}')
+            print(f'Password | {plain_text_password}')
 
 
 def hashing(password):
     key = base64.urlsafe_b64encode(main_password.encode('utf-8'))
     f = Fernet(key)
-    password = password.encode()
-    hashed = f.encrypt(password)
-    return hashed
+    hashed_pasword = f.encrypt(password.encode())
+    return hashed_pasword
 
 
 def decrypt(password):
     key = base64.urlsafe_b64encode(main_password.encode('utf-8'))
     f = Fernet(key)
-    unhashed = (f.decrypt(password)).decode('utf-8')
-    return unhashed
+    plain_text_password = (f.decrypt(password)).decode('utf-8')
+    return plain_text_password
 
 
-def agregar_cuenta():
-    servicio = click.prompt('Ingrese servicio').capitalize()
+def add_new_account():
+    service = click.prompt('Enter service').capitalize()
 
-    username = click.prompt('Ingrese el usuario')
+    username = click.prompt('Enter username')
 
-    check_1 = collection.find_one({'servicio': servicio, 'username': username})
+    result = collection.find_one({'service': service, 'username': username})
 
-    if check_1:
-        if click.confirm('El usuario ya existe, desea cambiar la password?'):
+    if result:
+        if click.confirm('The user already exists, do you wish to change the password?'):
             modify()
         else:
             menu()
     else:
-        password = click.prompt('Ingrese la password')
-        hashed = hashing(password)
+        password = click.prompt('Enter the password')
+        hashed_pasword = hashing(password)
 
         collection.insert_one(
             {
-                'servicio': servicio,
+                'service': service,
                 'username': username,
-                'password': hashed
+                'password': hashed_pasword
                 }
                 )
 
 
-def random_pasword():
-    length = click.prompt('Ingrese el largo de la password', type=int)
-    print('Utilice y/n para marcar su eleccion')
+def password_generator():
+    length = click.prompt('Enter the length of the password', type=int)
 
-    if click.confirm('Desea que contenga simbolos?'):
+    if click.confirm('Do you wish it to contain symbols?'):
         # Con simbolos
         characters = list(string.ascii_letters + string.digits + '!@#$%^&*()')
         random.shuffle(characters)
@@ -186,156 +184,140 @@ def random_pasword():
 
 
 def search_username():
-    username = click.prompt('Ingrese el usuario que desea buscar')
+    username = click.prompt('Enter the username you wish to search')
 
     accounts = list(collection.find({'username': username}))
 
     if len(accounts) == 0:
-        print('No existe ese usuario')
+        print("That username doesn't exist")
     else:
         for account in accounts:
-            servicio = account['servicio']
+            service = account['service']
             password = account['password']
-            uhpassword = decrypt(password)
+            hashed_pasword = decrypt(password)
 
         print('----------------------')
-        print(f'---- {servicio} ----')
-        print(f'Usuario  | {username}')
-        print(f'Password | {uhpassword}')
+        print(f'---- {service} ----')
+        print(f'User  | {username}')
+        print(f'Password | {hashed_pasword}')
 
 
-def complete_list():
-    total = collection.find({})
-    for account in total:
-        servicio = account['servicio']
+def get_all_accounts():
+    accounts = collection.find({})
+    for account in accounts:
+        service = account['service']
         username = account['username']
         password = account['password']
 
-        unhashed = decrypt(password)
+        plain_text_password = decrypt(password)
 
         print('---------------------------')
-        print(f'Servicio | {servicio}')
+        print(f'Servicio | {service}')
         print(f'Usuario  | {username}')
-        print(f'Password | {unhashed}')
+        print(f'Password | {plain_text_password}')
 
 
 def modify():
-    servicio = click.prompt(
-        'Ingrese el servicio que desea modificar'
-        ).capitalize()
-    services = list(collection.find({'servicio': servicio}))
+    service = click.prompt(
+         'Enter the service'
+         ).capitalize()
+    services = list(collection.find({'service': service}))
 
     if len(services) == 0:
-        print(f'No se encuentra el servicio: {servicio} en la base de datos')
+        print(f'The service: {service} is not found in the data base')
     else:
-        options = [
-                'Desea modificar el usuario?',
-                'Desea modificar la password?'
-                ]
-        questions = [
-                        {
-                            'type': 'list',
-                            'name': 'theme',
-                            'message': 'What do you want to do?',
-                            'choices': options
-                        }
-                    ]
-        answers = prompt(questions, style=custom_style_2)
-        
-        if answers['theme'] == 'Desea modificar el usuario?':
-            old_user = click.prompt('Ingrese el usuario que desea modificar')
+        BOLD = '\033[1m'
+        END = '\033[0m'
+        selection_message = f'Change{BOLD} Username{END} or{BOLD} Password{END}'
+        modify_selection = click.prompt(f"{selection_message}", type=click.Choice(['user', 'pass']))
+        old_user = click.prompt('Enter the username of the account')
 
+        if modify_selection == 'user':
             accounts = list(collection.find(
                 {
-                    'servicio': servicio,
+                    'service': service,
                     'username': old_user
                 }))
 
             if len(accounts) == 0:
                 print(
-                        f'No se encontro el usuario: {old_user} en el servicio: {servicio}'
+                        f'The user: {old_user} was not found in the service: {service}'
                     )
             else:
-                new_user = click.prompt('Ingrese el nuevo nombre de usuario')
+                new_user = click.prompt('Enter the new username')
 
-                if click.confirm('Esta seguro que desea modificar el usuario?'):
+                if click.confirm(f'\nAre you sure you want to modify the user?\n{old_user} --> {new_user}'):
 
                     collection.find_one_and_update(
                         {
-                            'servicio': servicio,
+                            'service': service,
                             'username': old_user
                         },
                         {
                             '$set': {'username': new_user}
                         })
-                    print('El usuario se actualizo correctamente')
+                    print('The username was updated correctly')
 
                 else:
-                    print('Se ha cancelado la operacion')
+                    print('The operation was cancelled')
 
-        elif answers['theme'] == 'Desea modificar la password?':
-            user = click.prompt(
-                'Ingrese el usuario que desea cambiarle la password'
-                )
-            check = list(collection.find(
+        elif modify_selection == 'pass':
+            account = list(collection.find(
                 {
-                    'servicio': servicio,
-                    'username': user
+                    'service': service,
+                    'username': old_user
                 }))
 
-            if len(check) == 0:
-                print(f'No se encontro el usuario: {user} en el servicio: {servicio}')
+            if len(account) == 0:
+                print(f'The user: {old_user} was not found in the service: {service}')
             else:
-                new_password = click.prompt('Ingrese la nueva password')
+                new_password = click.prompt('Enter the new password', confirmation_prompt=True, hide_input=True)
 
-                if click.confirm('Esta seguro que desea modificar la password?'):
-                    hashed = hashing(new_password)
+                if click.confirm('Are you sure you want to modify the password?'):
+                    hashed_pasword = hashing(new_password)
 
                     collection.find_one_and_update(
                         {
-                            'servicio': servicio,
-                            'username': user
+                            'service': service,
+                            'username': old_user
                         },
                         {
-                            '$set': {'password': hashed}
+                            '$set': {'password': hashed_pasword}
                         })
-                    print('La password se ha actualizado correctamente')
+                    print('The password was updated correctly')
 
                 else:
-                    print('Se ha cancelado la operacion')
-
-        else:
-            print('La opcion ingresada no existe')
+                    print('The operation was cancelled')
 
 
 def delete():
-    servicio = click.prompt('Ingrese el servicio que desea eliminar')
+    service = click.prompt('Enter the service').capitalize()
 
-    services = list(collection.find({'servicio': servicio}))
+    services = list(collection.find({'service': service}))
 
     if len(services) == 0:
-        print(f'No se encuentra el servicio: {servicio} en la base de datos')
+        print(f'The service: {service} was not found in the data base')
     else:
-        user = click.prompt('Ingrese el usuario que desea eliminar')
+        user = click.prompt('Enter the username you wish to delete')
         accounts = list(collection.find(
             {
-                'servicio': servicio,
+                'service': service,
                 'username': user
             }))
 
         if len(accounts) == 0:
-            print(f'No existe ningun usuario con el nombre: {user} en el servicio: {servicio}')
+            print(f'There is no username: {user} in the service: {service}')
 
         else:
-            if click.confirm('Se encontro la cuenta! \nEsta seguro que desea eliminarla?'):
+            if click.confirm('The account was found! \nAre you sure you want to delete it?'):
                 collection.find_one_and_delete(
                     {
-                        'servicio': servicio,
+                        'service': service,
                         'username': user
                     })
-                print('Se ha eliminado la cuenta correctamente')
+                print('The account was deleted correctly')
             else:
-                print('Se ha cancelado la operacion')
+                print('The operation was cancelled')
 
 
 # Si el tipo tiene ya una cuenta:
