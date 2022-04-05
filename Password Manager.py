@@ -10,7 +10,9 @@ import click
 import requests
 
 
-cluster = MongoClient('mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+cluster = MongoClient(
+    'mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+    )
 db = cluster['password_manager']
 collection = db['accounts']
 
@@ -20,15 +22,17 @@ main_password = 'E2d25dSpas5NNHNE7fq5NCZSF6RTadtk'
 def sign_up():
 
     main_password = click.prompt(
-        'New password (must contain 32 characters)'
+        'New password (must contain 32 characters)',
+        hide_input=True
         )
 
     while len(main_password) != 32:
         main_password = click.prompt(
-            'Re-enter new passowrd (must contain 32 characters)'
+            'New passowrd (must contain 32 characters)', 
+            hide_input=True
             )
 
-    main_password_2 = click.prompt('Confirm password')
+    main_password_2 = click.prompt('Confirm password', hide_input=True)
 
     if main_password == main_password_2:
         url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
@@ -50,7 +54,8 @@ def sign_up():
 def log_in():
     # Ingresar main password para poder acceder al manager
     log_in_password = click.prompt(
-        'Enter the main password to access'
+        'Enter the main password to access',
+        hide_input=True
         )
 
     url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
@@ -147,7 +152,11 @@ def add_new_account():
         else:
             menu()
     else:
-        password = click.prompt('Enter the password')
+        password = click.prompt(
+                'Enter the password',
+                confirmation_prompt=True,
+                hide_input=True
+                )
         hashed_pasword = hashing(password)
 
         collection.insert_one(
@@ -226,13 +235,23 @@ def modify():
     if len(services) == 0:
         print(f'The service: {service} is not found in the data base')
     else:
-        BOLD = '\033[1m'
-        END = '\033[0m'
-        selection_message = f'Change{BOLD} Username{END} or{BOLD} Password{END}'
-        modify_selection = click.prompt(f"{selection_message}", type=click.Choice(['user', 'pass']))
-        old_user = click.prompt('Enter the username of the account')
+        options = [
+            'User',
+            'Password'
+        ]
 
-        if modify_selection == 'user':
+        questions = [
+            {
+                'type': 'list',
+                'name': 'theme',
+                'message': 'What do you want to do?',
+                'choices': options
+            }
+                ]
+        answers = prompt(questions, style=custom_style_2)
+
+        if answers['theme'] == 'User':
+            old_user = click.prompt('Enter the username of the account')
             accounts = list(collection.find(
                 {
                     'service': service,
@@ -261,7 +280,8 @@ def modify():
                 else:
                     print('The operation was cancelled')
 
-        elif modify_selection == 'pass':
+        elif answers['theme'] == 'Password':
+            old_user = click.prompt('Enter the username of the account')
             account = list(collection.find(
                 {
                     'service': service,
@@ -271,7 +291,11 @@ def modify():
             if len(account) == 0:
                 print(f'The user: {old_user} was not found in the service: {service}')
             else:
-                new_password = click.prompt('Enter the new password', confirmation_prompt=True, hide_input=True)
+                new_password = click.prompt(
+                        'Enter the new password',
+                        confirmation_prompt=True,
+                        hide_input=True
+                        )
 
                 if click.confirm('Are you sure you want to modify the password?'):
                     hashed_pasword = hashing(new_password)
