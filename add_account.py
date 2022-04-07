@@ -1,14 +1,8 @@
 import click
-from pymongo import MongoClient
 from encrypt import hashing
 
-cluster = MongoClient(
-    'mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    )
-db = cluster['password_manager']
-collection = db['accounts']
 
-def add_new_account():
+def add_new_account(collection):
     service = click.prompt('Enter service').capitalize()
 
     username = click.prompt('Enter username')

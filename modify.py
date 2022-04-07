@@ -1,16 +1,9 @@
-from pymongo import MongoClient
 import click
 from PyInquirer import prompt
 from examples import custom_style_2
 
-cluster = MongoClient(
-    'mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    )
-db = cluster['password_manager']
-collection = db['accounts']
 
-
-def modify():
+def modify(collection):
     service = click.prompt(
          'Enter the service'
          ).capitalize()

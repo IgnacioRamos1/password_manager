@@ -1,19 +1,11 @@
 import click
-from pymongo import MongoClient
 from decrypt import decrypt
 
-cluster = MongoClient(
-    'mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    )
-db = cluster['password_manager']
-collection = db['accounts']
 
-
-def select_service():
+def select_service(collection):
     search = click.prompt(
         'Enter the service you want to search'
         ).capitalize()
-    print(search)
     result = list(collection.find({'service': search}))
 
     if len(result) == 0:

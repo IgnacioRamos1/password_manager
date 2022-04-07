@@ -1,14 +1,7 @@
-from pymongo import MongoClient
 from decrypt import decrypt
 
-cluster = MongoClient(
-    'mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    )
-db = cluster['password_manager']
-collection = db['accounts']
 
-
-def get_all_accounts():
+def get_all_accounts(collection):
     accounts = collection.find({})
     for account in accounts:
         service = account['service']

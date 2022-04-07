@@ -1,14 +1,7 @@
-from pymongo import MongoClient
 import click
 
 
-cluster = MongoClient(
-    'mongodb+srv://IgnacioRamos:TZxa68aDGrWWVUeq@cluster0.tzlxj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    )
-db = cluster['password_manager']
-collection = db['accounts']
-
-def delete():
+def delete(collection):
     service = click.prompt('Enter the service').capitalize()
 
     services = list(collection.find({'service': service}))
