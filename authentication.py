@@ -6,24 +6,40 @@ from PyInquirer import prompt
 from examples import custom_style_2
 requests.packages.urllib3.disable_warnings()
 
-url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
-headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
-user = str(uuid.UUID(int=uuid.getnode()))
+
+def create_account(main_password):
+    user = str(uuid.UUID(int=uuid.getnode()))
+    data = '{"data":{"user": "%s", "main_password": "%s"}}' % (user, main_password)
+    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
+    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    requests.post(url, headers=headers, data=data, verify=False)
+
+
+def get_account(main_password):
+    user = str(uuid.UUID(int=uuid.getnode()))
+    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
+    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    account = requests.get(url, headers=headers, verify=False)
+
+    return account.json()['data']['data']['user'] == user and account.json()['data']['data']['main_password'] == main_password
+    
+
+def check_if_user_exists():
+    user = str(uuid.UUID(int=uuid.getnode()))
+    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
+    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    account = requests.get(url, headers=headers, verify=False)
+
+    return account.json()['data']['data']['user'] == user
 
 
 def log_in():
-    # Ingresar main password para poder acceder al manager
-    log_in_password = click.prompt(
+    main_password = click.prompt(
         'Enter the main password to access',
         hide_input=True
         )
-    r = requests.get(url, headers=headers, verify=False)
-    if r.json()['data']['data'][user] == log_in_password:
-        print('----------Welcome!---------')
-        return True
-    else:
-        print('The main password is incorrect')
-        return False
+
+    return get_account(main_password)
 
 
 def sign_up():
@@ -41,13 +57,8 @@ def sign_up():
     main_password_2 = click.prompt('Confirm password', hide_input=True)
 
     if main_password == main_password_2:
-        r = requests.get(url, headers=headers, verify=False)
 
-        for key in r.json()['data']['data'].keys():
-            stored_user = key
-
-        if stored_user == user:
-            print('The computer is already registered')
+        if not get_account(main_password):
 
             # Ofrecer opcion cambiar password o loguearse
 
@@ -65,8 +76,7 @@ def sign_up():
             ]
             answers = prompt(questions, style=custom_style_2)
             if answers['theme'] == 'Log In':
-                # Lo mando al log in
-                print('log in')
+                return True
 
             elif answers['theme'] == 'Change main Password':
                 new_main_password = click.prompt(
@@ -86,21 +96,17 @@ def sign_up():
                     )
 
                 if new_main_password == new_main_password_2:
-                    info = '{"data":{"%s": "%s"}}' % (user, new_main_password)
-                    r = requests.post(
-                        url,
-                        headers=headers,
-                        data=info,
-                        verify=False
-                        )
+                    create_account(main_password)
                     print('The new password was set correctly')
-                    # Lo mando al login
+                    return True
 
         else:
-            info = '{"data":{"%s": "%s"}}' % (user, main_password)
-            r = requests.post(url, headers=headers, data=info, verify=False)
+            create_account(main_password)
             print('The new password was set correctly')
-            # Lo mando al log in
+            return True
     else:
         print("Passwords don't match")
-        # Lo hago registrarse de nuevo
+        return False
+
+def change_main_password():
+    return

@@ -9,39 +9,55 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import log_in, sign_up
+from authentication import log_in, sign_up, check_if_user_exists, change_main_password
 
 
 def main():
-    options = [
-        'Log In',
-        'Sign Up'
+    if check_if_user_exists():
+        # Parece que ya tienes una cuenta asociada, que deseas hacer?
+        # Le ofrezco log in o cambiar password
+        return
+    else:
+        options = [
+            'Log In',
+            'Sign Up'
+            ]
+        questions = [
+            {
+                'type': 'list',
+                'name': 'theme',
+                'message': 'Welcome!',
+                'choices': options
+            }
         ]
-    questions = [
-        {
-            'type': 'list',
-            'name': 'theme',
-            'message': 'Welcome!',
-            'choices': options
-        }
-    ]
-    answers = prompt(questions, style=custom_style_2)
-    if answers['theme'] == 'Log In':
-        authenticated = False
-        counter = 0
+        answers = prompt(questions, style=custom_style_2)
+        if answers['theme'] == 'Log In':
+            authenticated = False
+            counter = 0
 
-        while not authenticated and counter < 3:
-            counter += 1
-            authenticated = log_in()
+            while not authenticated and counter < 3:
+                counter += 1
+                authenticated = log_in()
 
-        if not authenticated:
-            print('Too many wrong attempts')
-            main()
-        else:
-            menu()
+            if not authenticated:
+                print('Too many wrong attempts')
+                main()
+            else:
+                menu()
 
-    elif answers['theme'] == 'Sign Up':
-        sign_up()
+        elif answers['theme'] == 'Sign Up':
+            authenticated = False
+            counter = 0
+
+            while not authenticated and counter < 3:
+                counter += 1
+                authenticated = sign_up()
+
+            if not authenticated:
+                print('Too many wrong attempts')
+                main()
+            else:
+                menu()
 
 
 def menu():
