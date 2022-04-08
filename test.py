@@ -12,8 +12,13 @@ else:
 import requests
 import uuid
 
+user = str(uuid.UUID(int=uuid.getnode()))
 url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
 headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+main_password = input('ingrese main password')
+data = '{"data":{"user": "123", "main_password": "%s"}}' % (main_password)
+requests.post(url, headers=headers, data=data, verify=False)
+
 r = requests.get(url, headers=headers, verify=False)
 
 print(r.json())

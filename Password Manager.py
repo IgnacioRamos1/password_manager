@@ -9,55 +9,72 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import log_in, sign_up, check_if_user_exists, change_main_password
+from authentication import log_in, sign_up, check_if_user_exists, authentication
 
 
 def main():
     if check_if_user_exists():
-        # Parece que ya tienes una cuenta asociada, que deseas hacer?
-        # Le ofrezco log in o cambiar password
-        return
+        options = [
+            'Log in',
+            'Change main password'
+            ]
+        questions = [
+            {
+                'type': 'list',
+                'name': 'theme',
+                'message': 'It seems you already have an account',
+                'choices': options
+            }
+        ]
+        answers = prompt(questions, style=custom_style_2)
+        if answers['theme'] == 'Log in':
+            authenticated = authentication(log_in())
+            if not authenticated:
+                print('Wrong Password')
+                main()
+            else:
+                menu()
+        elif answers['theme'] == 'Change main password':
+            authenticated = authentication(sign_up())
+
+            if not authenticated:
+                print("Passwords don't match")
+                main()
+            else:
+                authenticated = authentication(log_in())
+                if not authenticated:
+                    print('Wrong Password')
+                    main()
+                else:
+                    menu()
+
     else:
         options = [
-            'Log In',
             'Sign Up'
             ]
         questions = [
             {
                 'type': 'list',
                 'name': 'theme',
-                'message': 'Welcome!',
+                'message': 'Welcome!, Please Sing Up.',
                 'choices': options
             }
         ]
         answers = prompt(questions, style=custom_style_2)
-        if answers['theme'] == 'Log In':
-            authenticated = False
-            counter = 0
-
-            while not authenticated and counter < 3:
-                counter += 1
-                authenticated = log_in()
+        if answers['theme'] == 'Sign Up':
+            authenticated = authentication(sign_up())
 
             if not authenticated:
-                print('Too many wrong attempts')
+                print("Passwords don't match")
                 main()
             else:
-                menu()
+                authenticated = authentication(log_in())
 
-        elif answers['theme'] == 'Sign Up':
-            authenticated = False
-            counter = 0
-
-            while not authenticated and counter < 3:
-                counter += 1
-                authenticated = sign_up()
-
-            if not authenticated:
-                print('Too many wrong attempts')
-                main()
-            else:
-                menu()
+                if not authenticated:
+                    print('Wrong Password')
+                    main()
+                else:
+                    menu()
 
 
 def menu():

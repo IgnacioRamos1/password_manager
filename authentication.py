@@ -2,9 +2,14 @@
 import click
 import requests
 import uuid
-from PyInquirer import prompt
-from examples import custom_style_2
 requests.packages.urllib3.disable_warnings()
+
+
+def authentication(value):
+    authenticated = False
+    authenticated = value
+
+    return authenticated
 
 
 def create_account(main_password):
@@ -13,6 +18,7 @@ def create_account(main_password):
     url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
     headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
     requests.post(url, headers=headers, data=data, verify=False)
+    return True
 
 
 def get_account(main_password):
@@ -22,7 +28,7 @@ def get_account(main_password):
     account = requests.get(url, headers=headers, verify=False)
 
     return account.json()['data']['data']['user'] == user and account.json()['data']['data']['main_password'] == main_password
-    
+
 
 def check_if_user_exists():
     user = str(uuid.UUID(int=uuid.getnode()))
@@ -57,56 +63,7 @@ def sign_up():
     main_password_2 = click.prompt('Confirm password', hide_input=True)
 
     if main_password == main_password_2:
-
-        if not get_account(main_password):
-
-            # Ofrecer opcion cambiar password o loguearse
-
-            options = [
-                'Log In',
-                'Change main Password'
-                ]
-            questions = [
-                {
-                    'type': 'list',
-                    'name': 'theme',
-                    'message': 'How do you wish to proceed?',
-                    'choices': options
-                }
-            ]
-            answers = prompt(questions, style=custom_style_2)
-            if answers['theme'] == 'Log In':
-                return True
-
-            elif answers['theme'] == 'Change main Password':
-                new_main_password = click.prompt(
-                    'New password (must contain 32 characters)',
-                    hide_input=True
-                    )
-
-                while len(new_main_password) != 32:
-                    new_main_password = click.prompt(
-                        'New passowrd (must contain 32 characters)',
-                        hide_input=True
-                        )
-
-                new_main_password_2 = click.prompt(
-                    'Confirm password',
-                    hide_input=True
-                    )
-
-                if new_main_password == new_main_password_2:
-                    create_account(main_password)
-                    print('The new password was set correctly')
-                    return True
-
-        else:
-            create_account(main_password)
-            print('The new password was set correctly')
-            return True
+        create_account(main_password)
+        return True
     else:
-        print("Passwords don't match")
         return False
-
-def change_main_password():
-    return
