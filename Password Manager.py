@@ -9,11 +9,13 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import log_in, sign_up, check_if_user_exists, authentication
+from authentication import log_in, sign_up, user_exists, authentication
 
 
 def main():
-    if check_if_user_exists():
+    if user_exists():
+        # Llamar a funcion que haga todo esto (NOMBRARLAS BIEN XD)
+        # Hacer que despues de tres intentos me rechace (login y signup)
         options = [
             'Log in',
             'Change main password'
@@ -28,27 +30,21 @@ def main():
         ]
         answers = prompt(questions, style=custom_style_2)
         if answers['theme'] == 'Log in':
-            authenticated = authentication(log_in())
-            if not authenticated:
+            if not log_in():
                 print('Wrong Password')
                 main()
             else:
                 menu()
         elif answers['theme'] == 'Change main password':
-            authenticated = authentication(sign_up())
-
-            if not authenticated:
+            if not sign_up():
+                # Crear funcion change password
                 print("Passwords don't match")
                 main()
             else:
-                authenticated = authentication(log_in())
-                if not authenticated:
-                    print('Wrong Password')
-                    main()
-                else:
-                    menu()
+                main()
 
     else:
+        # Llamar a funcion que haga todo esto (NOMBRARLAS BIEN XD)
         options = [
             'Sign Up'
             ]

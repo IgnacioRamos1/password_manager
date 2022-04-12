@@ -30,7 +30,7 @@ def get_account(main_password):
     return account.json()['data']['data']['user'] == user and account.json()['data']['data']['main_password'] == main_password
 
 
-def check_if_user_exists():
+def user_exists():
     user = str(uuid.UUID(int=uuid.getnode()))
     url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
     headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}

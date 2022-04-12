@@ -9,7 +9,7 @@ if test == key:
     print('son iguales')
 else:
     print('no son iguales')'''
-import requests
+'''import requests
 import uuid
 
 user = str(uuid.UUID(int=uuid.getnode()))
@@ -31,4 +31,8 @@ print(stored_user)
 
 user = str(uuid.UUID(int=uuid.getnode()))
 print(user)
-print(type(user))
+print(type(user))'''
+
+import connect_database
+
+print(connect_database.collection)
