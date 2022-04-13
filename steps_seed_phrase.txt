@@ -1,0 +1,22 @@
+1. Generate random data --> ENTROPY
+
+Para generar correctamente una seed phrase la ENTROPY generada debe cumplir: 
+- Tener 128 bits (12 palabras)
+
+2. Run the entropy through the hash function (SHA256)
+
+Input --> Random source data
+Output --> Checksum
+
+Corro el input por SHA256 --> Los primeros X digitos se agregan al input -->
+
+X = Cociente de la entropia / 32
+
+256 bits of entropy - add the first 8 bits of the checksum to the random data
+
+2.1 Transform from hexadecimal to binary
+
+Es necesario? Porque creo que esta utilizando BIP39 (que creo que es el programa) entonces cuando
+yo haga el hash de las palabras en teoria no deberia darme automaticamente en hexadecimal?
+Y despues puedo deshashearlo y chequearlo con el diccionario que ya tengo
+
