@@ -1,22 +1,35 @@
 1. Generate random data --> ENTROPY
 
+Entropy --> Meaure of "randomness", es un numero random tan largo que es casi imposible que se vuelva a generar (de forma random)
+Se puede generar de cualquier forma que sea REALMENTE random
+
+Se genera en BINARIO --> Una secuencia de bits sera --> Entropia
+
 Para generar correctamente una seed phrase la ENTROPY generada debe cumplir: 
 - Tener 128 bits (12 palabras)
 
-2. Run the entropy through the hash function (SHA256)
+2. BIP39 Wordlist
 
-Input --> Random source data
-Output --> Checksum
+Tiene 2048 palabras
+Cada palabra tiene asignado un numero que es el numero de la posicion de la palabra
 
-Corro el input por SHA256 --> Los primeros X digitos se agregan al input -->
+En binario - un set de 11 bits puede representar un numero del 0 al 2047
+Voy a tener sets de 11 bits que van a representar un numero (palabra)
+Puedo formar 11 sets completos
 
-X = Cociente de la entropia / 32
+El ultimo set tengo 7 bits (faltan 4 para formar una palabra)
 
-256 bits of entropy - add the first 8 bits of the checksum to the random data
+3. Checksum
 
-2.1 Transform from hexadecimal to binary
+Checksum --> ultimos 4 bits
 
-Es necesario? Porque creo que esta utilizando BIP39 (que creo que es el programa) entonces cuando
-yo haga el hash de las palabras en teoria no deberia darme automaticamente en hexadecimal?
-Y despues puedo deshashearlo y chequearlo con el diccionario que ya tengo
+Como obtengo el checksum? --> Hashing la entropy (SHA 256)
+SHA256 --> Numero hexadecimal
 
+Tomo el primer caracter (ejemplo: "C") y lo transformo en binario 4 digitos ("C" = "1100")
+Tomo esos 4 bits y los agrego al final de los 7 bits
+Con estos nuevos 11 bits tengo la ultima palabra
+
+4. Lookup words
+
+Teniendo los 12 numeros busco las palabras individualmente
