@@ -2,29 +2,38 @@
 import click
 import requests
 import uuid
+from change_password import seed_phrase
 requests.packages.urllib3.disable_warnings()
 
 
-def authentication(value):
-    authenticated = False
-    authenticated = value
+def url_headers():
+    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
+    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    return url, headers
 
-    return authenticated
+
+def change_main_password(seed):
+    url, headers = url_headers()
+    account = requests.get(url, headers=headers, verify=False)
+
+    if account.json()['data']['data']['seed_phrase'] == seed:
+        return True
+    else:
+        return False
 
 
 def create_account(main_password):
+    seed = seed_phrase()
     user = str(uuid.UUID(int=uuid.getnode()))
-    data = '{"data":{"user": "%s", "main_password": "%s"}}' % (user, main_password)
-    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
-    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    data = '{"data":{"user": "%s", "main_password": "%s", "seed_phrase": "%s"}}' % (user, main_password, seed)
+    url, headers = url_headers()
     requests.post(url, headers=headers, data=data, verify=False)
-    return True
+    return seed
 
 
 def get_account(main_password):
     user = str(uuid.UUID(int=uuid.getnode()))
-    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
-    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    url, headers = url_headers()
     account = requests.get(url, headers=headers, verify=False)
 
     return account.json()['data']['data']['user'] == user and account.json()['data']['data']['main_password'] == main_password
@@ -32,8 +41,7 @@ def get_account(main_password):
 
 def user_exists():
     user = str(uuid.UUID(int=uuid.getnode()))
-    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
-    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
+    url, headers = url_headers()
     account = requests.get(url, headers=headers, verify=False)
 
     return account.json()['data']['data']['user'] == user
@@ -63,7 +71,7 @@ def sign_up():
     main_password_2 = click.prompt('Confirm password', hide_input=True)
 
     if main_password == main_password_2:
-        create_account(main_password)
-        return True
+        seed = create_account(main_password)
+        return True, seed
     else:
-        return False
+        return False, None

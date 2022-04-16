@@ -3,12 +3,18 @@ import secrets
 import hashlib
 
 
+def divide_chunks(list, n):
+    for i in range(0, len(list), n):
+        yield list[i:i + n]
+
+
 def seed_phrase():
-    hex = (secrets.token_hex(16))
+    entropy_hex = (secrets.token_hex(16))
 
-    binary = bin(int(hex, 16))[2:].zfill(128)
+    entropy_binary = bin(int(entropy_hex, 16))[2:].zfill(128)
 
-    numbers_binary = [binary[i:i+11] for i in range(0, len(binary), 11)]
+    n = 11
+    numbers_binary = list(divide_chunks(entropy_binary, n))
 
     checksum = hashlib.sha256(numbers_binary[11].encode('utf-8')).hexdigest()
     checksum_binary = bin(int(checksum[0], 16))[2:].zfill(4)
@@ -30,7 +36,6 @@ def seed_phrase():
         seed_word = content[word].strip('\n')
         seed.append(seed_word)
 
-    print(seed)
+    seed_string = ' '.join(seed)
 
-
-seed_phrase()
+    return seed_string

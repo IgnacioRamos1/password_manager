@@ -1,4 +1,5 @@
 
+import click
 from PyInquirer import prompt
 from examples import custom_style_2
 from select_service import select_service
@@ -9,13 +10,12 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import log_in, sign_up, user_exists, authentication
+from authentication import log_in, sign_up, user_exists, change_main_password
 
 
 def main():
     if user_exists():
         # Llamar a funcion que haga todo esto (NOMBRARLAS BIEN XD)
-        # Hacer que despues de tres intentos me rechace (login y signup)
         options = [
             'Log in',
             'Change main password'
@@ -30,18 +30,62 @@ def main():
         ]
         answers = prompt(questions, style=custom_style_2)
         if answers['theme'] == 'Log in':
-            if not log_in():
-                print('Wrong Password')
+            authenticated = False
+            counter = 0
+
+            while not authenticated and counter < 3:
+                counter += 1
+                authenticated = log_in()
+
+            if not authenticated:
+                print('Too many wrong attempts')
                 main()
             else:
                 menu()
+
         elif answers['theme'] == 'Change main password':
-            if not sign_up():
-                # Crear funcion change password
-                print("Passwords don't match")
+
+            authenticated = False
+            counter = 0
+
+            while not authenticated and counter < 3:
+                seed_input = click.prompt('Enter the 12 words')
+                counter += 1
+                authenticated = change_main_password(seed_input)
+
+            if not authenticated:
+                print('Too many wrong attempts')
                 main()
             else:
-                main()
+                authenticated = False
+                counter = 0
+
+                while not authenticated and counter < 3:
+                    counter += 1
+                    authenticated, seed = sign_up()
+
+                if not authenticated:
+                    print("Too many wrong attempts")
+                    main()
+                else:
+                    print('=========================================================================')
+                    print('Save this seed phrase, you will need it to reset your password')
+                    print('WARNING: This will be the last time you will see it')
+                    print('=========================================================================')
+                    print(seed)
+                    print('=========================================================================')
+
+                    authenticated = False
+                    counter = 0
+
+                    while not authenticated and counter < 3:
+                        counter += 1
+                        authenticated = log_in()
+                    if not authenticated:
+                        print('Too many wrong attempts')
+                        main()
+                    else:
+                        menu()
 
     else:
         # Llamar a funcion que haga todo esto (NOMBRARLAS BIEN XD)
@@ -58,16 +102,32 @@ def main():
         ]
         answers = prompt(questions, style=custom_style_2)
         if answers['theme'] == 'Sign Up':
-            authenticated = authentication(sign_up())
+            authenticated = False
+            counter = 0
+
+            while not authenticated and counter < 3:
+                counter += 1
+                authenticated, seed = sign_up()
 
             if not authenticated:
-                print("Passwords don't match")
+                print("Too many wrong attempts")
                 main()
             else:
-                authenticated = authentication(log_in())
+                print('=========================================================================')
+                print('Save this seed phrase, you will need it to reset your password')
+                print('WARNING: This will be the last time you will see it')
+                print('=========================================================================')
+                print(seed)
+                print('=========================================================================')
 
+                authenticated = False
+                counter = 0
+
+                while not authenticated and counter < 3:
+                    counter += 1
+                    authenticated = log_in()
                 if not authenticated:
-                    print('Wrong Password')
+                    print('Too many wrong attempts')
                     main()
                 else:
                     menu()
