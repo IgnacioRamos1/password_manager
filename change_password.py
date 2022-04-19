@@ -21,21 +21,16 @@ def seed_phrase():
 
     numbers_binary[11] = numbers_binary[11]+checksum_binary
 
-    numbers_int = []
-
-    for number in numbers_binary:
-        number = int(number, 2)
-        numbers_int.append(number)
-
     file = open("BIP39_Wordlist.txt", "r")
     content = file.readlines()
 
     seed = []
 
-    for word in numbers_int:
-        seed_word = content[word].strip('\n')
+    for number in numbers_binary:
+        seed_word = content[int(number, 2)].strip()
         seed.append(seed_word)
 
     seed_string = ' '.join(seed)
 
     return seed_string
+

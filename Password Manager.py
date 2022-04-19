@@ -49,7 +49,7 @@ def main():
             counter = 0
 
             while not authenticated and counter < 3:
-                seed_input = click.prompt('Enter the 12 words')
+                seed_input = click.prompt('Enter the 12 words with spaces in between them')
                 counter += 1
                 authenticated = change_main_password(seed_input)
 

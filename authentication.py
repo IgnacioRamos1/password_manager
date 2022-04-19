@@ -5,15 +5,12 @@ import uuid
 from change_password import seed_phrase
 requests.packages.urllib3.disable_warnings()
 
-
-def url_headers():
-    url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
-    headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
-    return url, headers
+user = str(uuid.UUID(int=uuid.getnode()))
+url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
+headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
 
 
 def change_main_password(seed):
-    url, headers = url_headers()
     account = requests.get(url, headers=headers, verify=False)
 
     if account.json()['data']['data']['seed_phrase'] == seed:
@@ -24,26 +21,18 @@ def change_main_password(seed):
 
 def create_account(main_password):
     seed = seed_phrase()
-    user = str(uuid.UUID(int=uuid.getnode()))
     data = '{"data":{"user": "%s", "main_password": "%s", "seed_phrase": "%s"}}' % (user, main_password, seed)
-    url, headers = url_headers()
     requests.post(url, headers=headers, data=data, verify=False)
     return seed
 
 
 def get_account(main_password):
-    user = str(uuid.UUID(int=uuid.getnode()))
-    url, headers = url_headers()
     account = requests.get(url, headers=headers, verify=False)
-
     return account.json()['data']['data']['user'] == user and account.json()['data']['data']['main_password'] == main_password
 
 
 def user_exists():
-    user = str(uuid.UUID(int=uuid.getnode()))
-    url, headers = url_headers()
     account = requests.get(url, headers=headers, verify=False)
-
     return account.json()['data']['data']['user'] == user
 
 
