@@ -10,7 +10,8 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import log_in, sign_up, user_exists, change_main_password
+from authentication import user_exists
+from login import log_in
 
 
 def main():
