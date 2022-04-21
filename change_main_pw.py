@@ -2,6 +2,7 @@
 import requests
 import uuid
 import click
+from authentication import confirmation
 requests.packages.urllib3.disable_warnings()
 
 url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
@@ -19,7 +20,7 @@ def get_seed():
     return check_seed(seed_input), None
 
 
-def change_main_password():
+def change_main_password_input():
     main_password = click.prompt(
         'Enter new password',
         hide_input=True,
@@ -34,3 +35,24 @@ def change_main_password():
         return True, None
     else:
         return False, None
+
+
+def change_main_password():
+    authenticated, _ = confirmation(get_seed, 0)
+
+    if not authenticated:
+        print('Too many wrong attempts')
+        main()
+    else:
+        authenticated, _ = confirmation(change_main_password_input, 0)
+
+        if not authenticated:
+            print("Too many wrong attempts")
+            main()
+        else:
+            authenticated, _ = confirmation(login_input, 0)
+            if not authenticated:
+                print('Too many wrong attempts')
+                main()
+            else:
+                menu()

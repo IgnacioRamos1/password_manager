@@ -11,7 +11,7 @@ from modify import modify
 from delete import delete
 from connect_database import connect_database
 from authentication import user_exists, confirmation
-from login import log_in
+from login import login_input, login
 from signup import sign_up
 
 
@@ -32,10 +32,7 @@ def main():
         ]
         answers = prompt(questions, style=custom_style_2)
         if answers['theme'] == 'Log in':
-
-            authenticated, _ = confirmation(log_in, 0)
-
-            if not authenticated:
+            if not login():
                 print('Too many wrong attempts')
                 main()
             else:
@@ -55,7 +52,7 @@ def main():
                     print("Too many wrong attempts")
                     main()
                 else:
-                    authenticated, _ = confirmation(log_in, 0)
+                    authenticated, _ = confirmation(login_input, 0)
                     if not authenticated:
                         print('Too many wrong attempts')
                         main()
@@ -90,7 +87,7 @@ def main():
                 print(seed)
                 print('=========================================================================')
 
-                authenticated, _ = confirmation(log_in, 0)
+                authenticated, _ = confirmation(login_input, 0)
                 if not authenticated:
                     print('Too many wrong attempts')
                     main()

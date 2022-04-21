@@ -1,6 +1,7 @@
 import click
 import requests
 import uuid
+from authentication import confirmation
 requests.packages.urllib3.disable_warnings()
 
 url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
@@ -13,10 +14,15 @@ def get_account(main_password):
     return account.json()['data']['data']['user'] == user and account.json()['data']['data']['main_password'] == main_password
 
 
-def log_in():
+def login_input():
     main_password = click.prompt(
         'Enter the main password to access',
         hide_input=True
         )
 
     return get_account(main_password), None
+
+
+def login():
+    authenticated, _ = confirmation(login_input, 0)
+    return authenticated
