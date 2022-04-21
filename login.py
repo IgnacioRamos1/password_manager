@@ -19,4 +19,4 @@ def log_in():
         hide_input=True
         )
 
-    return get_account(main_password)
+    return get_account(main_password), None

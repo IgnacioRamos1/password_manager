@@ -1,7 +1,7 @@
 
-import click
 from PyInquirer import prompt
 from examples import custom_style_2
+from change_main_pw import change_main_password, get_seed
 from select_service import select_service
 from add_account import add_new_account
 from password_generator import password_generator
@@ -10,8 +10,9 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import user_exists
+from authentication import user_exists, confirmation
 from login import log_in
+from signup import sign_up
 
 
 def main():
@@ -31,12 +32,8 @@ def main():
         ]
         answers = prompt(questions, style=custom_style_2)
         if answers['theme'] == 'Log in':
-            authenticated = False
-            counter = 0
 
-            while not authenticated and counter < 3:
-                counter += 1
-                authenticated = log_in()
+            authenticated, _ = confirmation(log_in, 0)
 
             if not authenticated:
                 print('Too many wrong attempts')
@@ -46,42 +43,19 @@ def main():
 
         elif answers['theme'] == 'Change main password':
 
-            authenticated = False
-            counter = 0
-
-            while not authenticated and counter < 3:
-                seed_input = click.prompt('Enter the 12 words with spaces in between them')
-                counter += 1
-                authenticated = change_main_password(seed_input)
+            authenticated, _ = confirmation(get_seed, 0)
 
             if not authenticated:
                 print('Too many wrong attempts')
                 main()
             else:
-                authenticated = False
-                counter = 0
-
-                while not authenticated and counter < 3:
-                    counter += 1
-                    authenticated, seed = sign_up()
+                authenticated, seed = confirmation(change_main_password, 0)
 
                 if not authenticated:
                     print("Too many wrong attempts")
                     main()
                 else:
-                    print('=========================================================================')
-                    print('Save this seed phrase, you will need it to reset your password')
-                    print('WARNING: This will be the last time you will see it')
-                    print('=========================================================================')
-                    print(seed)
-                    print('=========================================================================')
-
-                    authenticated = False
-                    counter = 0
-
-                    while not authenticated and counter < 3:
-                        counter += 1
-                        authenticated = log_in()
+                    authenticated, _ = confirmation(log_in, 0)
                     if not authenticated:
                         print('Too many wrong attempts')
                         main()
@@ -103,12 +77,7 @@ def main():
         ]
         answers = prompt(questions, style=custom_style_2)
         if answers['theme'] == 'Sign Up':
-            authenticated = False
-            counter = 0
-
-            while not authenticated and counter < 3:
-                counter += 1
-                authenticated, seed = sign_up()
+            authenticated, seed = confirmation(sign_up, 0)
 
             if not authenticated:
                 print("Too many wrong attempts")
@@ -121,12 +90,7 @@ def main():
                 print(seed)
                 print('=========================================================================')
 
-                authenticated = False
-                counter = 0
-
-                while not authenticated and counter < 3:
-                    counter += 1
-                    authenticated = log_in()
+                authenticated, _ = confirmation(log_in, 0)
                 if not authenticated:
                     print('Too many wrong attempts')
                     main()

@@ -1,8 +1,7 @@
 
-import click
 import requests
 import uuid
-from change_password import seed_phrase
+
 requests.packages.urllib3.disable_warnings()
 
 user = str(uuid.UUID(int=uuid.getnode()))
@@ -15,3 +14,11 @@ def user_exists():
     return account.json()['data']['data']['user'] == user
 
 
+def confirmation(function, value):
+    funcion, seed = function()
+    if funcion:
+        return True, seed
+    elif value >= 2:
+        return False, None
+    else:
+        return confirmation(function, value+1)

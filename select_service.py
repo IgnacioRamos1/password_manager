@@ -15,5 +15,5 @@ def select_service(collection):
         for account in result:
             plain_text_password = decrypt(account['password'])
             print('----------------------------')
-            print(f'User  | {account["username"]}')
+            print(f'User     | {account["username"]}')
             print(f'Password | {plain_text_password}')

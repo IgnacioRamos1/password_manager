@@ -11,27 +11,19 @@ user = str(uuid.UUID(int=uuid.getnode()))
 
 def create_account(main_password):
     seed = seed_phrase()
-    data = '{"data":{"user": "%s", "main_password": "%s", "seed_phrase": "%s"}}' % (user, main_password, seed)
+    data = '{"data":{"user": "%s", "main_password": "%s", "seed_phrase": "%s", "main_hashing_pw": "E2d25dSpas5NNHNE7fq5NCZSF6RTadtk"}}' % (user, main_password, seed)
     requests.post(url, headers=headers, data=data, verify=False)
     return seed
 
-#porque debe tener 32 caracteres justo?
 
 def sign_up():
     main_password = click.prompt(
-        'New password (must contain 32 characters)',
-        hide_input=True
+        'Enter new password',
+        hide_input=True,
+        confirmation_prompt=True
         )
 
-    while len(main_password) != 32:
-        main_password = click.prompt(
-            'New passowrd (must contain 32 characters)',
-            hide_input=True
-            )
-
-    main_password_2 = click.prompt('Confirm password', hide_input=True)
-
-    if main_password == main_password_2:
+    if main_password:
         seed = create_account(main_password)
         return True, seed
     else:

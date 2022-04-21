@@ -17,5 +17,5 @@ def search_username(collection):
 
         print('----------------------')
         print(f'---- {service} ----')
-        print(f'User  | {username}')
+        print(f'User     | {username}')
         print(f'Password | {hashed_pasword}')

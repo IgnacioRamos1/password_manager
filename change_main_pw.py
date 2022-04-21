@@ -1,6 +1,7 @@
 
 import requests
 import uuid
+import click
 requests.packages.urllib3.disable_warnings()
 
 url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
@@ -10,8 +11,26 @@ user = str(uuid.UUID(int=uuid.getnode()))
 
 def check_seed(seed):
     account = requests.get(url, headers=headers, verify=False)
+    return account.json()['data']['data']['seed_phrase'] == seed
 
-    if account.json()['data']['data']['seed_phrase'] == seed:
-        return True
+
+def get_seed():
+    seed_input = click.prompt('Enter the 12 words with spaces in between them')
+    return check_seed(seed_input), None
+
+
+def change_main_password():
+    main_password = click.prompt(
+        'Enter new password',
+        hide_input=True,
+        confirmation_prompt=True
+        )
+
+    if main_password:
+        account = requests.get(url, headers=headers, verify=False)
+        seed = account.json()['data']['data']['seed_phrase']
+        data = '{"data":{"user": "%s", "main_password": "%s", "seed_phrase": "%s", "main_hashing_pw": "E2d25dSpas5NNHNE7fq5NCZSF6RTadtk"}}' % (user, main_password, seed)
+        requests.post(url, headers=headers, data=data, verify=False)
+        return True, None
     else:
-        return False
+        return False, None
