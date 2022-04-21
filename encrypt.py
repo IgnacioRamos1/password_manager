@@ -13,11 +13,8 @@ def get_main_password():
     return account.json()['data']['data']['main_hashing_pw']
 
 
-main_password = get_main_password()
-
-
 def hashing(password):
-    key = base64.urlsafe_b64encode(main_password.encode('utf-8'))
+    key = base64.urlsafe_b64encode(get_main_password().encode('utf-8'))
     f = Fernet(key)
     hashed_pasword = f.encrypt(password.encode())
     return hashed_pasword

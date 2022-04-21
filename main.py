@@ -1,7 +1,7 @@
 
 from PyInquirer import prompt
 from examples import custom_style_2
-from change_main_pw import change_main_password, get_seed
+from change_main_pw import change_main_password_input, get_seed, change_main_password
 from select_service import select_service
 from add_account import add_new_account
 from password_generator import password_generator
@@ -40,20 +40,17 @@ def main():
 
         elif answers['theme'] == 'Change main password':
 
-            authenticated, _ = confirmation(get_seed, 0)
+            authenticated_get_seed, authenticated_main_password = change_main_password()
 
-            if not authenticated:
+            if not authenticated_get_seed:
                 print('Too many wrong attempts')
                 main()
             else:
-                authenticated, seed = confirmation(change_main_password, 0)
-
-                if not authenticated:
+                if not authenticated_main_password:
                     print("Too many wrong attempts")
                     main()
                 else:
-                    authenticated, _ = confirmation(login_input, 0)
-                    if not authenticated:
+                    if not login():
                         print('Too many wrong attempts')
                         main()
                     else:

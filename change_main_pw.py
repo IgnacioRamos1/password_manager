@@ -38,21 +38,6 @@ def change_main_password_input():
 
 
 def change_main_password():
-    authenticated, _ = confirmation(get_seed, 0)
-
-    if not authenticated:
-        print('Too many wrong attempts')
-        main()
-    else:
-        authenticated, _ = confirmation(change_main_password_input, 0)
-
-        if not authenticated:
-            print("Too many wrong attempts")
-            main()
-        else:
-            authenticated, _ = confirmation(login_input, 0)
-            if not authenticated:
-                print('Too many wrong attempts')
-                main()
-            else:
-                menu()
+    authenticated_get_seed, _ = confirmation(get_seed, 0)
+    authenticated_main_password, _ = confirmation(change_main_password_input, 0)
+    return authenticated_get_seed, authenticated_main_password
