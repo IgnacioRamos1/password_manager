@@ -2,32 +2,36 @@
 import requests
 import uuid
 import click
-from authentication import confirmation
 requests.packages.urllib3.disable_warnings()
 
-url = 'https://18.231.120.197:8200/v1/secret/data/password_manager'
-headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
 user = str(uuid.UUID(int=uuid.getnode()))
+url_seed = f'https://18.231.120.197:8200/v1/secret/data/password_manager/user/{user}/seed'
+url_main_password = f'https://18.231.120.197:8200/v1/secret/data/password_manager/user/{user}/main_password'
+headers = {'X-Vault-Token': 'hvs.2mYiopcfyjBbvdbiMFmaxt9H'}
 
 
-def change_main_password():
+def post_main_password():
     main_password = click.prompt(
         'Enter new password',
         hide_input=True,
         confirmation_prompt=True
     )
-    data = '{"data":{"seed_phrase": "%s"}}' % (main_password)
-    requests.post(url, headers=headers, data=data, verify=False)
+    data_main_password = '{"data": {"main_password": "%s"}}' % (main_password)
+    requests.post(url_main_password, headers=headers, data=data_main_password, verify=False)
 
 
-def change_main_pw():
-    vault_stored_seed = requests.get(url, headers=headers, verify=False).json()['data']['data']['seed_phrase']
-    
-    for _ in range(3):
+def change_mainpw():
+    vault_stored_seed = requests.get(url_seed, headers=headers, verify=False).json()['data']['data']['seed_phrase']
+
+    for attempt in range(3):
         seed_input = click.prompt('Enter the 12 words with spaces in between them')
 
-        if seed_input != vault_stored_seed:
+        if attempt == 3:
+            print('Too many wrong attempts')
+            exit()
+        elif seed_input != vault_stored_seed:
             continue
+
         else:
-            change_main_password()
-    exit()
+            post_main_password()
+            exit()

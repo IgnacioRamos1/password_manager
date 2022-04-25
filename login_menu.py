@@ -1,8 +1,8 @@
-import login
+from login import log_in
 from PyInquirer import prompt
 from examples import custom_style_2
-import change_main_pw
-import authentication
+from change_main_pw import change_mainpw
+
 
 def login_menu():
     options = [
@@ -20,6 +20,7 @@ def login_menu():
 
     answers = prompt(questions, style=custom_style_2)
     if answers['theme'] == 'Log in':
-        login()
+        log_in()
     elif answers['theme'] == 'Change main password':
-        change_main_pw()
+        change_mainpw()
+        log_in()

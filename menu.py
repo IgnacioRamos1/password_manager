@@ -1,6 +1,5 @@
 from PyInquirer import prompt
 from examples import custom_style_2
-from change_main_pw import change_main_password_input, get_seed, change_main_password
 from select_service import select_service
 from add_account import add_new_account
 from password_generator import password_generator
@@ -9,11 +8,9 @@ from get_accounts import get_all_accounts
 from modify import modify
 from delete import delete
 from connect_database import connect_database
-from authentication import user_exists, confirmation
-from login import login
-from signup import sign_up
 
-def menu():
+
+def main_menu():
     collection = connect_database()
 
     options = [
@@ -23,7 +20,8 @@ def menu():
         'Search for a username',
         'List of all accounts',
         'Modify an account',
-        'Delete an account'
+        'Delete an account',
+        'Exit'
         ]
     questions = [
         {
@@ -48,3 +46,7 @@ def menu():
         modify(collection)
     elif answers['theme'] == 'Delete an account':
         delete(collection)
+    elif answers['theme'] == 'Exit':
+        exit()
+
+    main_menu()
